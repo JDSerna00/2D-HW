@@ -16,6 +16,8 @@ namespace ClearSky
         bool isJumping = false;
         private bool alive = true;
 
+        public Transform groundCheck; 
+        public LayerMask groundLayer;
 
         // Start is called before the first frame update
         void Start()
@@ -32,14 +34,14 @@ namespace ClearSky
                 Hurt();
                 Die();
                 Attack();
-                Jump();
                 Run();
-
+                CheckGrounded();
             }
         }
         private void OnTriggerEnter2D(Collider2D other)
         {
             anim.SetBool("isJump", false);
+            isJumping = false;
         }
 
 
@@ -74,22 +76,22 @@ namespace ClearSky
         }
         public void Jump()
         {
-            if (!anim.GetBool("isJump"))
-            {
-                isJumping = true;
-                anim.SetBool("isJump", true);
-            }
             if (!isJumping)
             {
-                return;
+                anim.SetBool("isJump", true);
+                rb.AddForce(new Vector2(0, jumpPower), ForceMode2D.Impulse);
+                isJumping = true;
             }
+        }
+        void CheckGrounded()
+        {           
+            RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.1f, groundLayer);
 
-            rb.velocity = Vector2.zero;
-
-            Vector2 jumpVelocity = new Vector2(0, jumpPower);
-            rb.AddForce(jumpVelocity, ForceMode2D.Impulse);
-
-            isJumping = false;
+            if (hit.collider != null)
+            {
+                anim.SetBool("isJump", false);
+                isJumping = false;
+            }
         }
         void Attack()
         {
