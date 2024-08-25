@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 
 namespace ClearSky
 {
@@ -15,8 +17,10 @@ namespace ClearSky
         private int direction = 1;
         bool isJumping = false;
         private bool alive = true;
+        public bool isDead = false;
 
-        public Transform groundCheck; 
+        public Transform groundCheck;
+        public GameObject DeadPanel; 
         public LayerMask groundLayer;
 
         // Start is called before the first frame update
@@ -113,12 +117,20 @@ namespace ClearSky
         }
         void Die()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha3))
+            if (isDead)
             {
                 anim.SetTrigger("die");
                 alive = false;
+                StartCoroutine(ActivateDeadPanelWithDelay());
             }
         }
+
+        private IEnumerator ActivateDeadPanelWithDelay()
+        {
+            yield return new WaitForSeconds(1);
+            DeadPanel.SetActive(true);
+        }
+
         void Restart()
         {
             if (Input.GetKeyDown(KeyCode.Alpha0))
